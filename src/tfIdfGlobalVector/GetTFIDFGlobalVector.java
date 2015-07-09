@@ -7,7 +7,11 @@ import org.apache.lucene.util.BytesRef;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
+
+import static java.lang.Math.*;
 
 public class GetTFIDFGlobalVector {
 
@@ -42,7 +46,24 @@ public class GetTFIDFGlobalVector {
 
         int n =  indexLeafReader.numDocs();
         System.out.println("Total number of indexed documents found = "+n);
-        System.out.println("Total number of unique terms found in the index = "+indexLeafReader.terms(contentsFieldName).size());
+        //#Get the global terms
+        Terms globalTerms = indexLeafReader.terms(contentsFieldName);
+        long globalTermsSz = globalTerms.size();
+
+        //Fill in all the terms as key into a TreeMap with the corresponding value as a idf
+        TreeMap<String, Float> termIDFTreeMap = new TreeMap<String, Float>();
+        TermsEnum iGlobalTerm = globalTerms.iterator(null);
+        BytesRef bytesRef;
+        while ( (bytesRef = iGlobalTerm.next())!=null )
+        {
+            float IDF = (float) log((1 + ((float) n / (indexLeafReader.docFreq(new Term(contentsFieldName, bytesRef)) + 1))));
+            termIDFTreeMap.put(bytesRef.utf8ToString(), IDF);
+            System.out.println(bytesRef.utf8ToString()+"=="+IDF);
+        }
+        //IDF of entire collection dictionary now stored as a map in termIDFTreeMap
+
+        System.out.println("Total number of unique terms found in the index = "+globalTermsSz);
+        //System.out.println("Size of global termIDFTreeMap = "+termIDFTreeMap.size());
         //printTerms(indexLeafReader.terms(contentsFieldName));  //Printing the total number of terms within the index
 
         for ( int i = 0; i < n; i++  )
@@ -50,14 +71,16 @@ public class GetTFIDFGlobalVector {
             Document doc = indexLeafReader.document(i);
             IndexableField indexableField = doc.getField(fileNamesFieldName);
             System.out.println("#"+(i+1)+">"+fileNamesFieldName+": "+indexableField.stringValue());
-            /*Fields fields = indexLeafReader.getTermVectors(i);
+            Fields fields = indexLeafReader.getTermVectors(i);
             //Iterator<String> docFieldNameIterator =  fields.iterator();
-            Terms terms = fields.terms(contentsFieldName);
+            Terms locDocTerms = fields.terms(contentsFieldName);
 
-            System.out.println("\t\tTotal number of unique terms in file:"+doc.get("filename")+" = "+terms.size());
+            System.out.println("\t\tTotal number of unique terms in file:" + doc.get("filename") + " = " + locDocTerms.size());
+
+            //Create a treeMap to hold the document's tf-idf vector
 
 
-            TermsEnum termsEnum = terms.iterator(null);
+            TermsEnum termsEnum = locDocTerms.iterator(null);
 
             BytesRef termBytesRef;
             int count = 1;
