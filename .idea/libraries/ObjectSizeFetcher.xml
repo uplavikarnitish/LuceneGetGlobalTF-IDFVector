@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ObjectSizeFetcher">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/out/artifacts/ObjectSizeFetcher/ObjectSizeFetcher.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
