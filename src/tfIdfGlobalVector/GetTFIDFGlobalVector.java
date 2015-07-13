@@ -7,7 +7,9 @@ import org.apache.lucene.util.BytesRef;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static java.lang.Math.*;
@@ -20,7 +22,9 @@ public class GetTFIDFGlobalVector {
         String filename = args[1];
         String contentsFieldName = "contents";
         String fileNamesFieldName = "filename";
+        String fileName;
         LeafReader indexLeafReader = null;
+        float freq = 0, termWt = 0, docMagnitude = 0;
         try {
             IndexReader indexReader = DirectoryReader.open(new SimpleFSDirectory(Paths.get(indexDir)));
             List<LeafReaderContext> leafReaderContextList = indexReader.leaves();
@@ -44,6 +48,9 @@ public class GetTFIDFGlobalVector {
         }
 
         int n =  indexLeafReader.numDocs();
+
+        TreeMap<String, TreeMap<String, Float>> docTFIDFVectorTreeMap = new TreeMap<String, TreeMap<String, Float>>();
+        TreeMap<String, Float> docMagnitudeTreeMap = new TreeMap<String, Float>();
         System.out.println("Total number of indexed documents found = "+n);
         //#Get the global terms
         Terms globalTerms = indexLeafReader.terms(contentsFieldName);
@@ -70,7 +77,8 @@ public class GetTFIDFGlobalVector {
         {
             Document doc = indexLeafReader.document(i);
             IndexableField indexableField = doc.getField(fileNamesFieldName);
-            System.out.println("#"+(i+1)+">"+fileNamesFieldName+": "+indexableField.stringValue());
+            fileName = indexableField.stringValue();
+            System.out.println("#"+(i+1)+">"+fileNamesFieldName+": "+fileName);
             Fields fields = indexLeafReader.getTermVectors(i);
             //Iterator<String> docFieldNameIterator =  fields.iterator();
             Terms locDocTerms = fields.terms(contentsFieldName);
@@ -81,46 +89,64 @@ public class GetTFIDFGlobalVector {
                 //First create a vector(TreeMap) equal to the global dictionary size dimensions
                 //Creation can be done initially by copying the globalTermIDF as it is and then multiplying it with TF
             TreeMap<String, Float> docTFIDFTermVector = new TreeMap<String, Float>(globalTermIDFTreeMap);
+            docMagnitude = 0;
             //System.out.println("Size of docTFIDFTermVector = "+docTFIDFTermVector.size());
             //printSize(docTFIDFTermVector, "docTFIDFTermVector");
 
-            /*
-            TermsEnum termsEnum = locDocTerms.iterator(null);
-
+            //Looping over all the global space dimensions
+            //TODO: remove this line: TermsEnum termsEnum = locDocTerms.iterator(null);
+            Set<String> globalTermsSet = globalTermIDFTreeMap.keySet();
             BytesRef termBytesRef;
             int count = 1;
 
-            while ((termBytesRef = termsEnum.next()) != null)
+            Iterator<String> termStrIt = globalTermsSet.iterator();
+            while (termStrIt.hasNext())
             {
 
 
                 PostingsEnum postingsEnum;
-                Term term = new Term(contentsFieldName, termBytesRef);
+                String curTerm = termStrIt.next();
+                Term term = new Term(contentsFieldName, curTerm);
                 postingsEnum = indexLeafReader.postings(term);
-                String termInDocs = "";
-                String termInDocsPostingEnumEntry = "";
+                //String termInDocs = "";
+                //String termInDocsPostingEnumEntry = "";
 
                 int postingEntry = postingsEnum.nextDoc();
                 int postingLstLngth = 0;
+                boolean isTermInDoc = false;
+                freq = 0;
                 while( postingEntry != PostingsEnum.NO_MORE_DOCS )
                 {
-                    termInDocs = termInDocs + postingsEnum.docID() + "; ";
+                    //termInDocs = termInDocs + postingsEnum.docID() + "; ";
                     //termInDocsPostingEnumEntry  = termInDocsPostingEnumEntry + postingEntry + "; ";
                     if (postingsEnum.docID() == i )
                     {
 
                         //System.out.println("\n\n"+count+"> term = '"+termBytesRef.utf8ToString()+"' :: freq = "+postingsEnum.freq());
+                        freq = postingsEnum.freq();
                         count=count+1;
+                        isTermInDoc = true;
 
                     }
                     postingEntry = postingsEnum.nextDoc();
                     postingLstLngth++;
                 }
+                termWt = freq*globalTermIDFTreeMap.get(curTerm);
+                docTFIDFTermVector.put(curTerm, termWt);
+                docMagnitude = docMagnitude + (termWt*termWt);
+
+                //Put each document's term vector and magnitude in two different TreeMaps
+                docTFIDFVectorTreeMap.put(fileName, docTFIDFTermVector);
+                docMagnitudeTreeMap.put(fileName, docMagnitude);
+
                 //System.out.println("\n\t\tIndexLeafReader.docFreq = "+indexLeafReader.docFreq(term)+";");
                 //System.out.println("\t\tLucene Int. Documents idx. containing term = "+ termInDocs+"\t\tPostingsEnumLength = "+postingLstLngth);
                 //TODO Remove this line!! //System.out.println("\tTerm Frequency(termInDocsPostingEnumEntry) = "+ termInDocsPostingEnumEntry);
-
-            }*/
+            }
+            //System.out.println(docTFIDFTermVector);
+            System.out.println("Doc #"+(i+1)+" Document magnitude = "+docMagnitude);
+            System.out.println(docTFIDFVectorTreeMap);
+            System.out.println(docMagnitudeTreeMap);
         }
 
 
@@ -131,4 +157,5 @@ public class GetTFIDFGlobalVector {
         System.out.println("DEBUG!!--->> "+"size = "+ObjectSizeFetcher.sizeof(a)+msg);
 
     }
+
 }
