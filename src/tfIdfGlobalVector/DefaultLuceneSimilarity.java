@@ -65,8 +65,5 @@ public class DefaultLuceneSimilarity extends DefaultSimilarity {
             Document doc = is.doc(scoreDoc.doc);
             System.out.println("<#"+String.format("%02d", (i+1))+"> "+doc.get("filename")+"<ID:"+scoreDoc.doc+">"+" score:"+scoreDoc.score);
         }
-
-
-
     }
 }

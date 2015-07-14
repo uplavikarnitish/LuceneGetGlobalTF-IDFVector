@@ -18,4 +18,10 @@ public class LuceneDefaultSimilarityModified extends DefaultSimilarity {
     {
         return (float)1;
     }
+
+    @Override
+    public float sloppyFreq(int distance)
+    {
+        return 1;
+    }
 }
