@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 /**
  * Created by nuplavikar on 7/11/15.
  */
-public class DefaultLuceneSimilarity extends DefaultSimilarity {
+public class TFIDFOnlySimilarity extends DefaultSimilarity {
 
 
     public static void main(String[] args) throws Exception {
@@ -54,6 +54,7 @@ public class DefaultLuceneSimilarity extends DefaultSimilarity {
 
         QueryParser parser = new QueryParser("contents", new StandardAnalyzer());
         Query query = parser.parse(entireFileAsString);
+        System.out.println("Query Boost = "+query.getBoost());
         long start = System.currentTimeMillis();
         TopDocs hits = is.search(query, 10);
         long end = System.currentTimeMillis();

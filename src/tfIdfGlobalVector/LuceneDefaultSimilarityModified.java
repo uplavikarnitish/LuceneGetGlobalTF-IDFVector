@@ -24,4 +24,6 @@ public class LuceneDefaultSimilarityModified extends DefaultSimilarity {
     {
         return 1;
     }
+
+
 }
