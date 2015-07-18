@@ -5,6 +5,7 @@ import org.apache.lucene.index.*;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.BytesRef;
 
+import java.awt.dnd.InvalidDnDOperationException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Iterator;
@@ -135,20 +136,23 @@ public class GetTFIDFGlobalVector {
                 docTFIDFTermVector.put(curTerm, termWt);
                 docMagnitude = docMagnitude + (termWt*termWt);
 
-                //Put each document's term vector and magnitude in two different TreeMaps
-                docTFIDFVectorTreeMap.put(fileName, docTFIDFTermVector);
-                docMagnitudeTreeMap.put(fileName, docMagnitude);
+
 
                 //System.out.println("\n\t\tIndexLeafReader.docFreq = "+indexLeafReader.docFreq(term)+";");
                 //System.out.println("\t\tLucene Int. Documents idx. containing term = "+ termInDocs+"\t\tPostingsEnumLength = "+postingLstLngth);
                 //TODO Remove this line!! //System.out.println("\tTerm Frequency(termInDocsPostingEnumEntry) = "+ termInDocsPostingEnumEntry);
             }
             //System.out.println(docTFIDFTermVector);
-            System.out.println("Doc #"+(i+1)+" Document magnitude = "+docMagnitude);
-            System.out.println(docTFIDFVectorTreeMap);
-            System.out.println(docMagnitudeTreeMap);
+            System.out.println("Doc #"+(i+1)+" Document magnitude = "+docMagnitude+"\n");
+
+            //Put each document's term vector and magnitude in two different TreeMaps
+            docTFIDFVectorTreeMap.put(fileName, docTFIDFTermVector);
+            docMagnitude = (float)Math.sqrt(docMagnitude);
+            docMagnitudeTreeMap.put(fileName, docMagnitude);
         }
 
+
+        printDocTFIDFVectorTreeMapAndDocMagnitudeTreeMap(docTFIDFVectorTreeMap, docMagnitudeTreeMap);
 
     }
 
@@ -156,6 +160,25 @@ public class GetTFIDFGlobalVector {
     {
         System.out.println("DEBUG!!--->> "+"size = "+ObjectSizeFetcher.sizeof(a)+msg);
 
+    }
+
+    public static void printDocTFIDFVectorTreeMapAndDocMagnitudeTreeMap(TreeMap<String, TreeMap<String, Float>> docTFIDFVector, TreeMap<String, Float> docMagnitude)
+    {
+        Set<String> fileNames= docTFIDFVector.keySet();
+        String fileName;
+        if( fileNames.equals(docMagnitude.keySet()) == false )
+        {
+            InvalidDnDOperationException invalidDnDOperationException = new InvalidDnDOperationException("File name integrity wrong!!");
+            invalidDnDOperationException.printStackTrace();
+            System.exit(1);
+        }
+        Iterator<String> it = fileNames.iterator();
+        int count = 0;
+        while( it.hasNext() ) {
+            fileName = it.next();
+            float magnitude = docMagnitude.get(fileName);
+            System.out.println("#"+(++count)+" fileName:"+fileName+" Magnitude:"+magnitude+" terms=weight:"+docTFIDFVector.get(fileName));
+        }
     }
 
 }

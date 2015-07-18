@@ -3,12 +3,9 @@ package tfIdfGlobalVector;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.*;
 import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.index.DirectoryReader;
@@ -54,7 +51,11 @@ public class TFIDFOnlySimilarity extends DefaultSimilarity {
 
         QueryParser parser = new QueryParser("contents", new StandardAnalyzer());
         Query query = parser.parse(entireFileAsString);
-        System.out.println("Query Boost = "+query.getBoost());
+        System.out.println("query.getBoost() = "+query.getBoost());
+        //Create the proper weight for this query
+        Weight weight = query.createWeight(is, true);
+        System.out.println("weight.getValueForNormalization: "+weight.getValueForNormalization());
+        System.out.println("Query Norm:"+is.getSimilarity().queryNorm(weight.getValueForNormalization()));
         long start = System.currentTimeMillis();
         TopDocs hits = is.search(query, 10);
         long end = System.currentTimeMillis();
