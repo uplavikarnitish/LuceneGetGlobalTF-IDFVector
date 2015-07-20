@@ -13,7 +13,7 @@ public class LuceneDefaultSimilarityModified extends DefaultSimilarity {
         //System.out.println("coord:: This is working!! overlap:"+overlap+" maxOverlap:"+maxOverlap);
         float coord = super.coord(overlap, maxOverlap);
         System.out.println("Coord() value returned = "+ coord);
-        new Exception("In coord()").printStackTrace();
+        //new Exception("In coord()").printStackTrace();
         return coord;
     }
 

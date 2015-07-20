@@ -7,7 +7,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="lucene-analyzers-common-5.1.0" level="project" />
     <orderEntry type="library" name="ObjectSizeFetcher" level="project" />
+    <orderEntry type="library" name="lucene-core-5.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="lucene-analyzers-common-5.1.0" level="project" />
   </component>
 </module>

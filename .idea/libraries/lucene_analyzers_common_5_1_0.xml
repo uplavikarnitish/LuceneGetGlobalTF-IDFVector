@@ -2,7 +2,6 @@
   <library name="lucene-analyzers-common-5.1.0">
     <CLASSES>
       <root url="jar:///lucene-5.1.0_lib/lucene-analyzers-common-5.1.0.jar!/" />
-      <root url="jar:///lucene-5.1.0_lib/lucene-core-5.1.0.jar!/" />
       <root url="jar:///lucene-5.1.0_lib/lucene-demo-5.1.0.jar!/" />
       <root url="jar:///lucene-5.1.0_lib/lucene-queryparser-5.1.0.jar!/" />
     </CLASSES>
