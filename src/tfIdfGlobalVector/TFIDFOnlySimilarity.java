@@ -27,10 +27,10 @@ public class TFIDFOnlySimilarity extends DefaultSimilarity {
         }
         String indexDir = args[0];
         String fileName = args[1];
-        search(indexDir, fileName);
+        mySearch(indexDir, fileName);
     }
 
-    public static void search(String indexDir, String fileName) throws IOException, ParseException {
+    public static void mySearch(String indexDir, String fileName) throws IOException, ParseException {
 
         FileReader fr =  new FileReader(fileName);
         BufferedReader textReader = new BufferedReader(fr);
@@ -53,9 +53,9 @@ public class TFIDFOnlySimilarity extends DefaultSimilarity {
         Query query = parser.parse(entireFileAsString);
         System.out.println("query.getBoost() = "+query.getBoost());
         //Create the proper weight for this query
-        Weight weight = query.createWeight(is, true);
-        System.out.println("weight.getValueForNormalization: "+weight.getValueForNormalization());
-        System.out.println("Query Norm:"+is.getSimilarity().queryNorm(weight.getValueForNormalization()));
+        //Weight weight = query.createWeight(is, true);
+        //System.out.println("weight.getValueForNormalization: "+weight.getValueForNormalization());
+        //System.out.println("Query Norm:"+is.getSimilarity().queryNorm(weight.getValueForNormalization()));
         long start = System.currentTimeMillis();
         TopDocs hits = is.search(query, 10);
         long end = System.currentTimeMillis();
