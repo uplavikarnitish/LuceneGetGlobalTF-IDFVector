@@ -49,6 +49,7 @@ public class TFIDFOnlySimilarity extends DefaultSimilarity {
         is.setSimilarity(new LuceneDefaultSimilarityModified());
 
 
+
         QueryParser parser = new QueryParser("contents", new StandardAnalyzer());
         Query query = parser.parse(entireFileAsString);
         System.out.println("query.getBoost() = "+query.getBoost());
