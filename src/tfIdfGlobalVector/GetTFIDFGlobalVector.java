@@ -63,7 +63,7 @@ public class GetTFIDFGlobalVector {
         BytesRef bytesRef;
         while ( (bytesRef = iGlobalTerm.next())!=null )
         {
-            float IDF = (float) log((1 + ((float) n / (indexLeafReader.docFreq(new Term(contentsFieldName, bytesRef)) + 1))));
+            float IDF = (float) (log((((float) n / (indexLeafReader.docFreq(new Term(contentsFieldName, bytesRef)) + 1))))+1);
             globalTermIDFTreeMap.put(bytesRef.utf8ToString(), IDF);
             System.out.println(bytesRef.utf8ToString()+"=="+IDF);
         }
